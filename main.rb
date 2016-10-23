@@ -4,11 +4,23 @@ require_relative './lib/markov.rb'
 
 markov = Markov.new
 
-texts = File.read('./samples/sample_1')
+if File.exists?('./tmp/state')
+	dump = File.read('./tmp/state')
+	markov = Marshal.load(dump)
+else
+	texts = File.read('./samples/sample_1')
 
-markov.feed(texts)
-markov.normalize!
+	markov.feed(texts)
+	markov.normalize!
+end
+
 post = markov.generate_phrase()
-
 api = Koala::Facebook::API.new(FB_APP_TOKEN)
-api.put_wall_post(post) 
+api.put_wall_post(post)
+
+
+unless File.exists?('./tmp/state')
+	File.open('./tmp/state', 'w') do |file| 
+		Marshal.dump(markov, file)
+	end
+end 
