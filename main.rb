@@ -7,8 +7,9 @@ markov = Markov.new
 texts = File.read('./samples/sample_1')
 aphrase = File.read('./samples/sample_2')
 
-markov.feed(aphrase)
-post = markov.generate_phrase(', ')
+markov.feed(texts)
+markov.normalize!
+post = markov.generate_phrase('A')
 puts post
 
 #api = Koala::Facebook::API.new(FB_APP_TOKEN)
