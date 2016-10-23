@@ -1,1 +1,1 @@
-# random.jokes
+# random.jokes (a little modified)
