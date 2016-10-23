@@ -1,6 +1,9 @@
 require 'json'
 class Markov
-	
+
+
+	DELIMITER_REPLACE = %r{\s(\W)}.freeze
+	CAPITALIZED_WORD = %r{\A[A-Z]+[a-zA-Z0-9\-\.,]*}.freeze
 	TOKEN_SPLITTER = %r{\s+|(\,\s+)|(\.\s+|\.$)|(\?\s+|\?$)|(\!\s+|\!$)}.freeze
 	SENTENCE_END = %r{\A[\.|\?|!]\z}.freeze
 	attr_accessor :state	
@@ -8,6 +11,7 @@ class Markov
 
 	def initialize
 		@state = {}
+		@starter_words = []
 	end
 
 	def feed(texts)
@@ -15,9 +19,9 @@ class Markov
 		push(tokens)
 	end
 
-	def generate_phrase(token)
+	def generate_phrase
 		# Token is a string: " Hello " and needs to be stripped.
-		token = token.strip
+		token = @starter_words.sample
 		key = [token]
 		return '' unless @state[key] 
 		buffer = [token]
@@ -39,7 +43,7 @@ class Markov
 			key = [next_token]	
 				
 		end
-		buffer.join(' ')	
+		buffer.join(' ').gsub(' , ', ', ').gsub(DELIMITER_REPLACE, '\1')	
 		
 	end
 
@@ -69,7 +73,7 @@ class Markov
 		while index < tokens.size - 1
 			current_token = tokens[index].strip
 			next_token    = tokens[index + 1].strip
-		
+			@starter_words.push(current_token) if current_token =~ CAPITALIZED_WORD	
 			# ["cuvant"] => {'urmatorul' => 2, 'altul' => 3}
 			key = [current_token]
 
@@ -82,9 +86,8 @@ class Markov
 			end
 			
 			index += 1
-		end
-			 	
-			
+		end		
 	end
+
 
 end
